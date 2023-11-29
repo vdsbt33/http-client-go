@@ -78,6 +78,8 @@
                 let methodValue = methodField.value;
                 let urlValue = urlField.value;
 
+                checkUrlProtocol(urlField);
+
                 if (urlValue.length == 0 || methodValue.length == 0)
                     throw 'Url and Method cannot be empty';
 
@@ -86,16 +88,30 @@
                     headersValue = JSON.parse(headersField.value);
                 }
 
-                let request = await fetch(
-                    urlValue,
-                    {
-                        method: methodValue,
-                        body: dataField.value.length > 0 ? dataField.value : undefined,
-                        headers: headersValue
-                    }
-                )
+                let val = '';
+                try
+                {
+                    let response = await fetch(
+                        urlValue,
+                        {
+                            method: methodValue,
+                            body: dataField.value.length > 0 ? dataField.value : undefined,
+                            headers: headersValue
+                        }
+                    )
 
-                let val = await request.text();
+                    val = await response.text();
+
+                    if (response.status >= 400 && response.status < 600)
+                        throw new Error(`${response.status} ${response.statusText}\n${val}`);
+                }
+                catch (err)
+                {
+                    if (typeof(err) === 'object')
+                        val = 'ERROR: ' + (err?.message ?? err);
+                    else
+                        val = err;
+                }
 
                 let responseField = document.getElementById("response");
                 responseField.value = val;
@@ -106,8 +122,22 @@
                 if (responseField.value.length == 0)
                     return;
 
-                let result = JSON.stringify(JSON.parse(responseField.value), null, 2);
-                responseField.value = result;
+                try
+                {
+                    let result = JSON.stringify(JSON.parse(responseField.value), null, 2);
+                    responseField.value = result;
+                }
+                catch {}
+            }
+
+            function checkUrlProtocol(urlField) {
+                let allowedProtocols = ['http', 'https'];
+                let isAllowed = allowedProtocols.some(p => urlField.value.startsWith(p));
+
+                if (!isAllowed)
+                {
+                    urlField.value = 'http://' + urlField.value;
+                }
             }
         </script>
     </body>
