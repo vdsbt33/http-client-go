@@ -1,7 +1,7 @@
 # Http Client
 
 This is a minimalistic http client.
-You can simple open /src/static/index.html and use it right away.
+You can simple open `/src/static/index.html` and use it right away.
 If you are dealing with CORS, you can whitelist port 8080 and run it with Go.
 
 ## Requirements
