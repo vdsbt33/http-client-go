@@ -8,7 +8,6 @@ import (
 )
 
 func serveFiles(w http.ResponseWriter, r *http.Request) {
-    fmt.Printf("URL path: %s\n", r.URL.Path)
     http.ServeFile(w, r, "./src/static/index.html")
 }
 
