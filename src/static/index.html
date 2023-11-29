@@ -1,0 +1,114 @@
+<html>
+    <head>
+        <title>Rest Client</title>   
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
+    </head>
+    <body>
+        <style>
+            .w-100 {
+                width: 100%; 
+            }
+
+            textarea {
+                height: auto;
+            }
+        </style>
+        <div class="container">
+            <div class="row">
+                <div class="column">
+                    <label>Request</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="column column-20">
+                    <select id="method">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                    </select>
+                </div>
+                <div class="column column-60">
+                    <input id="url" placeholder="Url" />
+                </div>
+                <div class="column">
+                    <button id="submit" class="button w-100" onclick="onSubmit()">Submit</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="column">
+                    <textarea id="data" placeholder="Body" rows="5"></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <div class="column">
+                    <textarea id="headers" placeholder="Headers" rows="5"></textarea>
+                </div>
+            </div>
+            
+            <hr/>
+
+            <div class="row">
+                <div class="column">
+                    <label>Response</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="column">
+                    <textarea id="response" placeholder="Body" rows="5"></textarea>
+                </div>
+            </div>
+            <row class="row">
+            <div class="column column-20 column-offset-80">
+                <button class="button w-100" onclick="prettifyResponse()">
+                    Prettify
+                </button>
+            </div>
+            </row>
+        </div>
+
+        <script>
+            async function onSubmit() {
+                let methodField = document.getElementById("method");
+                let urlField = document.getElementById("url");
+                let dataField = document.getElementById("data");
+                let headersField = document.getElementById("headers");
+
+                let methodValue = methodField.value;
+                let urlValue = urlField.value;
+
+                if (urlValue.length == 0 || methodValue.length == 0)
+                    throw 'Url and Method cannot be empty';
+
+                let headersValue = {};
+                if (headersField.length > 0) {
+                    headersValue = JSON.parse(headersField.value);
+                }
+
+                let request = await fetch(
+                    urlValue,
+                    {
+                        method: methodValue,
+                        body: dataField.value.length > 0 ? dataField.value : undefined,
+                        headers: headersValue
+                    }
+                )
+
+                let val = await request.text();
+
+                let responseField = document.getElementById("response");
+                responseField.value = val;
+            }
+
+            function prettifyResponse() {
+                let responseField = document.getElementById("response");
+                if (responseField.value.length == 0)
+                    return;
+
+                let result = JSON.stringify(JSON.parse(responseField.value), null, 2);
+                responseField.value = result;
+            }
+        </script>
+    </body>
+</html>
